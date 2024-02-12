@@ -471,7 +471,7 @@ calculos_df = calculos_pob(input_df, selected_year, selected_genero)
 
 def mapa_poblacional(input_calculos):
 
-    with open('mexico-with-regions_.geojson', encoding='utf-8') as f:
+    with open('data/mexico-with-regions_.geojson', encoding='utf-8') as f:
         geojson_data = json.load(f)
 
     # Ordenando por el orden en geojson
@@ -535,7 +535,7 @@ mapa_poblacion_render = mapa_poblacional(calculos_df)
 
 def mapa_poblacional2(input_calculos):
 
-    with open('mexico-with-regions_.geojson', encoding='utf-8') as f:
+    with open('data/mexico-with-regions_.geojson', encoding='utf-8') as f:
         geojson_data = json.load(f)
 
     # Ordenando por el orden en geojson
