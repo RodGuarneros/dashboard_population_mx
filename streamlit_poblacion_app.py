@@ -145,139 +145,132 @@ with st.sidebar:
 
 
 # Ranking Edad
+
 def ranking_edad(input_df, input_year, input_genero, entidad_seleccionada=None):
-    año_seleccionado_dato_rank_edad = input_df[(input_df['AÑO'] == input_year) & (input_df['SEXO'] == input_genero)].reset_index(drop=True)
+    # Create a copy of the DataFrame to avoid SettingWithCopyWarning
+    año_seleccionado_dato_rank_edad = input_df[(input_df['AÑO'] == input_year) & (input_df['SEXO'] == input_genero)].copy()
     
-    result_df_2 = pd.DataFrame({
-        "ENTIDAD": año_seleccionado_dato_rank_edad['ENTIDAD'],
-        "Edad promedio": np.round(año_seleccionado_dato_rank_edad['EDAD_PROMEDIO'], 2)
-    }).sort_values(by='Edad promedio', ascending=True)
-
-    fig = px.bar(result_df_2, x='Edad promedio', y='ENTIDAD', orientation='h',
+    # Use explicit parameter in sort_values to avoid FutureWarning
+    result_df_2 = año_seleccionado_dato_rank_edad[['ENTIDAD', 'EDAD_PROMEDIO']].sort_values(by='EDAD_PROMEDIO', ascending=True)
+    
+    fig = px.bar(result_df_2, x='EDAD_PROMEDIO', y='ENTIDAD', orientation='h',
                  title=f'Ranking Nacional Edad Promedio {input_year}, {input_genero}',
-                 labels={'Edad promedio': 'Edad promedio', 'ENTIDAD': 'Estado'},
+                 labels={'EDAD_PROMEDIO': 'Edad promedio', 'ENTIDAD': 'Estado'},
                  template='plotly_dark',
-                 color='Edad promedio',
+                 color='EDAD_PROMEDIO',
                  color_continuous_scale='reds',
-                 custom_data=[result_df_2['Edad promedio']])  # Use custom_data to store 'Edad promedio' values
+                 custom_data=[result_df_2['EDAD_PROMEDIO']])  # Use custom_data to store 'Edad promedio' values
     
-    fig.update_layout(title_x=0.15)
-    fig.update_layout(margin=dict(b=30, t=30))
-    fig.update_layout(height=600)  # Adjust the height as needed
-    fig.update_layout(xaxis=dict(tickfont=dict(size=8)))  # Adjust the font size as needed
-    fig.update_traces(width=0.5)  # Adjust the width as needed
-    fig.update_traces(marker=dict(line=dict(width=7, color='DarkSlateGray', shape='spline')), selector=dict(mode='markers'), Width=0.1)
+    # Update layout settings
+    fig.update_layout(title_x=0.15, margin=dict(b=30, t=30), height=600, xaxis=dict(tickfont=dict(size=8)))
+    fig.update_traces(width=0.5, marker=dict(line=dict(width=7, color='DarkSlateGray', shape='spline')), selector=dict(mode='markers'), Width=0.1)
 
-
+    # Conditional coloring based on selected entity
     if entidad_seleccionada:
         selected_entity_color = '#1DD5EE'
         other_entity_color = '#D82C20'
         fig.update_traces(marker=dict(color=[selected_entity_color if entidad == entidad_seleccionada else other_entity_color for entidad in result_df_2['ENTIDAD']]),
                           selector=dict(type='bar'))
-        
     
     fig.update_layout({'plot_bgcolor': 'black', 'paper_bgcolor': 'black'})
-
+    
     # Add 'Edad promedio' values to the tooltip
     fig.update_traces(hovertemplate='<b>%{y}</b><br>Edad promedio=%{customdata[0]:,.2f}')
     fig.update_layout(title_font=dict(color='#FFD86C'), xaxis_title_font=dict(color='#FFD86C'), yaxis_title_font=dict(color='#FFD86C'))
     
     return fig
 
+
 fig_ranking = ranking_edad(input_df, selected_year, selected_genero, entidad_seleccionada=selected_entidad)
 
-
+#### Ranking Población total ##############
 def ranking_poblacion2(input_df, input_year, input_genero, entidad_seleccionada=None):
-    año_seleccionado_dato_rank_edad = input_df[(input_df['AÑO'] == input_year) & (input_df['SEXO'] == input_genero)].reset_index(drop=True)
-    año_seleccionado_dato_rank_edad = año_seleccionado_dato_rank_edad.sort_values(by='POBLACION', ascending=True)
-    año_seleccionado_dato_rank_edad = año_seleccionado_dato_rank_edad[año_seleccionado_dato_rank_edad['ENTIDAD'] != 'República Mexicana']
+    # Create a copy of the DataFrame to avoid SettingWithCopyWarning
+    año_seleccionado_dato_rank_poblacion = input_df[(input_df['AÑO'] == input_year) & (input_df['SEXO'] == input_genero)].copy()
+    
+    # Sort values explicitly to avoid FutureWarning
+    año_seleccionado_dato_rank_poblacion = año_seleccionado_dato_rank_poblacion.sort_values(by='POBLACION', ascending=True)
+    
+    # Filtering out 'República Mexicana'
+    año_seleccionado_dato_rank_poblacion = año_seleccionado_dato_rank_poblacion[año_seleccionado_dato_rank_poblacion['ENTIDAD'] != 'República Mexicana']
 
-    fig5 = px.bar(año_seleccionado_dato_rank_edad, x='POBLACION', y='ENTIDAD', orientation='h',
+    fig = px.bar(año_seleccionado_dato_rank_poblacion, x='POBLACION', y='ENTIDAD', orientation='h',
                  title=f'Ranking Nacional Población Total {input_year}, {input_genero}',
                  labels={'POBLACION': 'Población', 'ENTIDAD': 'Estado'},
                  template='plotly_dark',
-                #  color='POBLACIÓN',
                  color_continuous_scale='reds',
-                 custom_data=[año_seleccionado_dato_rank_edad['POBLACION']])  # Use custom_data to store 'Edad promedio' values
+                 custom_data=[año_seleccionado_dato_rank_poblacion['POBLACION']])  # Use custom_data to store 'Población' values
     
-    fig5.update_layout(title_x=0.15)
-    fig5.update_layout(margin=dict(b=30, t=30))
-    fig5.update_layout(height=600)  # Adjust the height as needed
-    fig5.update_layout(xaxis=dict(tickfont=dict(size=8)))  # Adjust the font size as needed
-    fig5.update_traces(width=0.5)  # Adjust the width as needed
-    fig5.update_traces(marker=dict(line=dict(width=7, color='DarkSlateGray', shape='spline')), selector=dict(mode='markers'), Width=0.1)
+    # Update layout settings
+    fig.update_layout(title_x=0.15, margin=dict(b=30, t=30), height=600, xaxis=dict(tickfont=dict(size=8)))
+    fig.update_traces(width=0.5, marker=dict(line=dict(width=7, color='DarkSlateGray', shape='spline')), selector=dict(mode='markers'), Width=0.1)
 
+    # Conditional coloring based on selected entity
     if entidad_seleccionada:
         selected_entity_color = '#1DD5EE'
         other_entity_color = '#D82C20'
-        fig5.update_traces(marker=dict(color=[selected_entity_color if entidad == entidad_seleccionada else other_entity_color for entidad in año_seleccionado_dato_rank_edad['ENTIDAD']]),
+        fig.update_traces(marker=dict(color=[selected_entity_color if entidad == entidad_seleccionada else other_entity_color for entidad in año_seleccionado_dato_rank_poblacion['ENTIDAD']]),
                           selector=dict(type='bar'))
-        
     
-    fig5.update_layout({'plot_bgcolor': 'black', 'paper_bgcolor': 'black'})
+    fig.update_layout({'plot_bgcolor': 'black', 'paper_bgcolor': 'black'})
+    
+    # Add 'Población' values to the tooltip
+    fig.update_traces(hovertemplate='<b>%{y}</b><br>Población=%{customdata[0]:,.0f}')
+    fig.update_layout(title_font=dict(color='#FFD86C'), xaxis_title_font=dict(color='#FFD86C'), yaxis_title_font=dict(color='#FFD86C'))
+    
+    return fig
 
-    # Add 'Edad promedio' values to the tooltip
-    fig5.update_traces(hovertemplate='<b>%{y}</b><br>POBLACIÓN=%{customdata[0]:,.0f}')
-    fig5.update_layout(title_font=dict(color='#FFD86C'), xaxis_title_font=dict(color='#FFD86C'), yaxis_title_font=dict(color='#FFD86C'))
-    
-    return fig5
 
 fig_ranking2 = ranking_poblacion2(input_df, selected_year, selected_genero, selected_entidad)
 
 ##### EVOLUCIÓN poblacional ######
+
 def evolucion_poblacion(input_df, entidad_seleccionada, highlight_year=None):
-    df = input_df[input_df['ENTIDAD'] == entidad_seleccionada].sort_values(by='AÑO')
+    # Filter DataFrame for selected entity and sort values
+    df = input_df[input_df['ENTIDAD'] == entidad_seleccionada].sort_values(by='AÑO').copy()
     
-    # Pivote
+    # Pivot table
     df_pivoted = df.pivot_table(index=['AÑO', 'ENTIDAD', 'Clave_Entidad', 'EDAD_PROMEDIO'], columns='SEXO', values='POBLACION', aggfunc='sum').reset_index()
 
-    # Renombrando las columnas
-    df_pivoted.columns.name = None  # ya no hay sexo name
+    # Rename columns
+    df_pivoted.columns.name = None
     df_pivoted = df_pivoted.rename(columns={'Hombres': 'POBLACION_Hombres', 'Mujeres': 'POBLACION_Mujeres', 'Total': 'POBLACION_Total'})
 
-    # Pivote
+    # Merge pivoted DataFrame with original DataFrame
     df_merged = pd.merge(df, df_pivoted, on=['AÑO', 'ENTIDAD', 'Clave_Entidad', 'EDAD_PROMEDIO']).groupby(['AÑO', 'ENTIDAD']).sum().reset_index()
     
     # Create the line chart
     fig = px.line(df_merged, x='AÑO', y=['POBLACION_Hombres', 'POBLACION_Mujeres', 'POBLACION_Total'],
-                  color_discrete_map={ 'POBLACION_Total': '#1DD5EE', 'POBLACION_Mujeres': '#D82C20', 'POBLACION_Hombres': 'lightgreen'},
+                  color_discrete_map={'POBLACION_Total': '#1DD5EE', 'POBLACION_Mujeres': '#D82C20', 'POBLACION_Hombres': 'lightgreen'},
                   labels={'AÑO': 'Año', 'value': 'Población'},
-                  title=f'Dinámica poblacional,<br> {entidad_seleccionada}',
+                  title=f'Dinámica poblacional, <br>{entidad_seleccionada}',
                   template='plotly_dark')
-    fig.update_traces(marker=dict(size=5))  # Adjust the size as needed
 
-# Reduce font size of y-axis labels
-    fig.update_layout(yaxis=dict(tickfont=dict(size=20)))  # Adjust the font size as needed
+    # Adjust marker size
+    fig.update_traces(marker=dict(size=5))
+    
+    # Reduce font size of y-axis labels
+    fig.update_layout(yaxis=dict(tickfont=dict(size=20)))
 
-    fig.update_layout(title_x=0.15)
-
-    fig.update_layout(legend=dict(traceorder='reversed'))
+    fig.update_layout(title_x=0.15, legend=dict(traceorder='reversed', title_text='Género', x=1, y=0.8, xanchor='left', yanchor='top'), plot_bgcolor='black', paper_bgcolor='black',
+                      title_font=dict(color='#FFD86C'), xaxis_title_font=dict(color='#FFD86C'), yaxis_title_font=dict(color='#FFD86C'), yaxis=dict(tickfont=dict(size=12)))
 
     # Customize legends manually
     fig.for_each_trace(lambda t: t.update(name='Total') if 'Total' in (t.name or '') else None)
     fig.for_each_trace(lambda t: t.update(name='Mujeres') if 'Mujeres' in (t.name or '') else None)
     fig.for_each_trace(lambda t: t.update(name='Hombres') if 'Hombres' in (t.name or '') else None)
-    
 
-    # Add a circular marker for the highlighted year
+    # Add circular marker for the highlighted year
     if highlight_year:
         year_marker_data = df_merged[df_merged['AÑO'] == highlight_year]
+        circle_size = 12
         fig.add_trace(go.Scatter(x=[highlight_year] * 3, y=year_marker_data[['POBLACION_Hombres', 'POBLACION_Mujeres', 'POBLACION_Total']].values.flatten(),
                                  mode='markers',
-                                 marker=dict(color='yellow', size=10, opacity=0.3),
+                                 marker=dict(color='green', size=circle_size, opacity=0.3, line=dict(color='white', width=2)),
                                  showlegend=False))
-    circle_size = 12
-    fig.add_trace(go.Scatter(x=[highlight_year] * 3, y=year_marker_data[['POBLACION_Hombres', 'POBLACION_Mujeres', 'POBLACION_Total']].values.flatten(),
-                             mode='markers',
-                             marker=dict(color='green', size=circle_size, opacity=0.3, line=dict(color='white', width=2)),
-                             showlegend=False))
-    # Update layout
-    fig.update_layout(legend_title_text=f'Género', legend=dict(itemsizing='constant', title_font=dict(color='white'), font=dict(color='white')))
-
-    fig.update_layout({'plot_bgcolor': 'black', 'paper_bgcolor': 'black'})
-    fig.update_layout(title_font=dict(color='#FFD86C'), xaxis_title_font=dict(color='#FFD86C'), yaxis_title_font=dict(color='#FFD86C'))
 
     return fig
+
 
 
 # Display evolution plot
@@ -321,7 +314,7 @@ def piramide_poblacional(input_datos, input_year, entidad_seleccionada = None):
     fig.update_layout({'plot_bgcolor': 'black', 'paper_bgcolor': 'black'})
     fig.update_layout(title_x=0.15)
 
-    fig.update_layout(legend=dict(traceorder='reversed'))
+    fig.update_layout(legend=dict(traceorder='reversed', x=1, y=0.8))
 
     # Adjust orientation of x-axis labels for 'Mujeres' and 'Hombres' columns
     fig.update_xaxes(tickangle=0, side='top', col=0)  # For 'Hombres' column
@@ -359,37 +352,37 @@ def calculate_statistics(df):
 # estadisticas
 
 def histograma_poblacional(input_df, input_year, input_entidad, input_genero):
-    df = input_df[(input_df['AÑO'] == input_year) & (input_df['ENTIDAD'] == input_entidad) & (input_df['SEXO'] == input_genero)].groupby('EDAD')['POBLACION'].sum().reset_index()
+    # Filter the DataFrame
+    df = input_df[(input_df['AÑO'] == input_year) & (input_df['ENTIDAD'] == input_entidad) & (input_df['SEXO'] == input_genero)]
+
+    # Group by age and sum the population
+    df_grouped = df.groupby('EDAD')['POBLACION'].sum().reset_index()
 
     # Create a weighted array for the ages
-    ages = np.repeat(df['EDAD'], df['POBLACION'])
+    ages = np.repeat(df_grouped['EDAD'], df_grouped['POBLACION'])
 
-    fig = px.histogram(df, x='EDAD', y='POBLACION', nbins=25,
+    # Plotting using Plotly Express
+    fig = px.histogram(df_grouped, x='EDAD', y='POBLACION', nbins=25,
                        labels={'EDAD': 'Edad', 'POBLACION': 'Población total'},
-                       title=f'Población por edad,<br> {input_entidad} {selected_year} ({selected_genero})',
+                       title=f'Población por edad,<br> {input_entidad} {input_year} ({input_genero})',
                        template='plotly_dark',
                        color_discrete_sequence=px.colors.qualitative.Set1,
                        opacity=0.8
                        )
     
     # Set the y-axis range based on the data
-    fig.update_layout(
-        yaxis=dict(range=[0, df['POBLACION'].max() * 5], title='Frecuencia absoluta'),  # Adjust the multiplier as needed
-        autosize=True
-    )
+    fig.update_layout(yaxis=dict(range=[0, df_grouped['POBLACION'].max() * 5], title='Frecuencia absoluta'),  # Adjust the multiplier as needed
+                      autosize=True)
 
-    # Update layout for white lines
+    # Customize layout
     fig.update_layout(bargap=0.02,  # Set small gap between bars
-                      bargroupgap=0.1)  # Set gap between groups of bars
-    
-    fig.update_layout(bargap=0.02,  # Set small gap between bars
-                    bargroupgap=0.1,  # Set gap between groups of bars
-                    xaxis=dict(gridcolor='gray'),  # Set x-axis grid color
-                    yaxis=dict(gridcolor='gray')  # Set y-axis grid color
-                    )
+                      bargroupgap=0.1,  # Set gap between groups of bars
+                      xaxis=dict(gridcolor='gray'),  # Set x-axis grid color
+                      yaxis=dict(gridcolor='gray')  # Set y-axis grid color
+                      )
 
     # Get statistics text
-    statistics_text = calculate_statistics(df)
+    statistics_text = calculate_statistics(df_grouped)
 
     # Add annotation with statistics text
     fig.add_annotation(
@@ -408,11 +401,12 @@ def histograma_poblacional(input_df, input_year, input_entidad, input_genero):
     # Update legend title
     fig.update_layout(legend_title_text='Grupos de Edad')
 
+    # Update layout for background color
     fig.update_layout({'plot_bgcolor': 'black', 'paper_bgcolor': 'black'})
 
+    # Update layout for font color
     fig.update_layout(title_font=dict(color='#FFD86C'), xaxis_title_font=dict(color='#FFD86C'), yaxis_title_font=dict(color='#FFD86C'))
 
-    # Show the plot
     return fig
 
 # Example usage
@@ -420,20 +414,20 @@ fig_hist = histograma_poblacional(input_hist, selected_year, selected_entidad, s
 
 #### Cálculos poblacionales ######
 def calculos_pob(input_df, input_year, input_genero):
-    
+    # Filter data for the selected year and gender
     año_seleccionado_dato = input_df[(input_df['AÑO'] == input_year) & (input_df['SEXO'] == input_genero)].reset_index(drop=True)
 
+    # Filter data for the previous year
     input_df_pre = input_df[input_df['AÑO'] == input_year - 1]
-        # Select data for the previous year
     año_previo_dato = input_df_pre[input_df_pre['SEXO'] == input_genero].reset_index(drop=True)
-        
-        # Calculate the difference in population
+
+    # Calculate the difference in population
     diferencia_poblacional = año_seleccionado_dato['POBLACION'] - año_previo_dato['POBLACION']
-        
-        # Calculate the absolute difference in population
+    
+    # Calculate the absolute difference in population
     población_diferencia_absoluta = abs(diferencia_poblacional)
-        
-        # Calculate the growth rate with a check for zero difference
+    
+    # Calculate the growth rate with a check for zero difference
     growth_rate = np.where(
         año_previo_dato['POBLACION'] == 0,
         0,  # Set growth rate to 0 if the previous year's population is 0
@@ -441,11 +435,11 @@ def calculos_pob(input_df, input_year, input_genero):
     )
 
     growth_rate_round = np.round(growth_rate, 2)
-    
-        # Create a new DataFrame with selected columns
+
+    # Create a new DataFrame with selected columns
     result_df = pd.DataFrame({
         'AÑO': año_seleccionado_dato['AÑO'],
-        "name": año_seleccionado_dato['ENTIDAD'],
+        'name': año_seleccionado_dato['ENTIDAD'],
         'Categoría': año_seleccionado_dato['SEXO'],
         'POBLACIÓN': año_seleccionado_dato['POBLACION'],
         'POBLACION_2023': año_previo_dato['POBLACION'],
@@ -453,16 +447,18 @@ def calculos_pob(input_df, input_year, input_genero):
         'diferencia_poblacional': diferencia_poblacional,
         'población_diferencia_absoluta': población_diferencia_absoluta,
         'Crecimiento': growth_rate_round,
-        'Edad promedio':año_seleccionado_dato['EDAD_PROMEDIO']
+        'Edad promedio': año_seleccionado_dato['EDAD_PROMEDIO']
     })
-        
-        # Sort the DataFrame based on the population difference
-    df_población_diferencia_ordenada = result_df
 
+    # Sort the DataFrame based on the population difference
+    df_población_diferencia_ordenada = result_df.sort_values(by='diferencia_poblacional', ascending=False)
+
+    # Drop rows with specific conditions
     df_población_diferencia_ordenada.drop(df_población_diferencia_ordenada[df_población_diferencia_ordenada['name'] == 'República Mexicana'].index, inplace=True)
     df_población_diferencia_ordenada.loc[(df_población_diferencia_ordenada['AÑO'] == 1970) & (df_población_diferencia_ordenada['Crecimiento'] == -99.28), 'Crecimiento'] = 1.1
 
     return df_población_diferencia_ordenada
+
 
 calculos_df = calculos_pob(input_df, selected_year, selected_genero) 
 
