@@ -521,7 +521,7 @@ def mapa_poblacional(input_calculos):
     # Define the hovertemplate for the tooltip
     hover_template = (
         "<b>%{customdata[0]}</b><br>" +  # Include "Entidad" in bold
-        "<extra>Edad promedio: %{customdata[1]}</extra>"  # Include "Edad promedio"
+        "<extra>Edad promedio: %{customdata[1]:,.2f}</extra>"  # Include "Edad promedio"
     )
 
     # Update traces to set hovertemplate
@@ -585,7 +585,7 @@ def mapa_poblacional2(input_calculos):
     # Define the hovertemplate for the tooltip
     hover_template = (
         "<b>%{customdata[0]}</b><br>" +  # Include "Entidad" in bold
-        "<extra>Población Total: %{customdata[1]:,.0f}</extra>"  # Include "Población" with commas
+        "<extra>Población Total: %{customdata[1]:,.2f}</extra>"  # Include "Población" with commas
     )
     fig3.update_traces(hovertemplate=hover_template)
 
@@ -626,7 +626,7 @@ with tab1:
 
     with chart1_col:
         with st.expander('Perspectivas', expanded=False):
-            st.markdown(f'La población de <span style="color:#C2185B">{selected_entidad}</span> seguirá enfrentando cambios radicales. La tasa de crecimiento anual en <span style="color:#C2185B">{selected_year}</span> es de <span style="color:#C2185B">{calculos_df.Crecimiento.iloc[0]}%</span>.', unsafe_allow_html=True)
+            st.markdown(f'La población de <span style="color:#C2185B">{selected_entidad}</span> seguirá enfrentando cambios radicales. La tasa de crecimiento anual en <span style="color:#C2185B">{selected_year}</span> es de <span style="color:#C2185B">{calculos_df.Crecimiento.iloc[0]:,.1f}%</span>.', unsafe_allow_html=True)
             st.markdown(f'Las entidades que claramente han alcanzado su máximo poblacional y revertido su tendencia para registrar tasas decrecientes son: Ciudad de México (2019), Guerrero (2016) y Veracruz (2016).', unsafe_allow_html=True)
             st.markdown(f'<span style="color:#C2185B">Nuevo León</span> es una de las entidades federativas que <span style="color:#C2185B">se pronostica que no alcanzará su máximo histórico en 2070 y seguirá creciendo aunque con menor aceleración</span>.', unsafe_allow_html=True)
             st.markdown(f'Se han encontrado tendencias que requieren más atención por considerarse un fenómeno atípico (no atribuible al procesamiento de los datos) o ajustes en la medición. Como son los casos de: <span style="color:#C2185B">Campeche, Chiapas, Nayarit, Durango, Quintana Roo, Sinaloa, Sonora, Tabasco, Tamaulipas y Zacatecas</span>.', unsafe_allow_html=True)
@@ -635,7 +635,7 @@ with tab1:
 
     with chart2_col:
         with st.expander('Perspectivas', expanded=False):
-            st.markdown(f'La edad promedio en <span style="color:#C2185B">{selected_entidad}</span> para el año <span style="color:#C2185B">{selected_year}</span> se registra en <span style="color:#C2185B">{calculos_df.loc[0, "Edad promedio"]} años</span>.', unsafe_allow_html=True)
+            st.markdown(f'La edad promedio en <span style="color:#C2185B">{selected_entidad}</span> para el año <span style="color:#C2185B">{selected_year}</span> se registra en <span style="color:#C2185B">{calculos_df.loc[0, "Edad promedio"]:,.2f} años</span>.', unsafe_allow_html=True)
             st.markdown(f'Claramente y sin excepción, las mujeres superan a los hombres en número.', unsafe_allow_html=True)
             st.markdown(f'Todos los estados proyectan un giro en la pirámide poblacional donde las personas más jóvenes comienzan a reducirse año con año y la población adulta, incluidos los mayores de 65 años, comienza a aumentar, lo que <span style="color:#C2185B">incrementa la tasa de dependencia (número de personas que no trabaja y tiene más de 65 años, comparada con aquellos que están en edad de trabajar)</span>.', unsafe_allow_html=True)
         
@@ -643,7 +643,7 @@ with tab1:
 
     with chart3_col:
         with st.expander('Perspectivas', expanded=False):
-            st.markdown(f'La edad promedio en <span style="color:#C2185B">{selected_entidad}</span> para el año <span style="color:#C2185B">{selected_year}</span> es de <span style="color:#C2185B">{calculos_df.loc[0, "Edad promedio"]} años</span>. Se trata de un estadístico de tendencia central útil. No obstante, ante la existencia de datos aberrantes, se sugiere la mediana de la edad disponible en las última sección de este tablero, cuya cualidad es que es menos sensible a los datos extremos.', unsafe_allow_html=True)
+            st.markdown(f'La edad promedio en <span style="color:#C2185B">{selected_entidad}</span> para el año <span style="color:#C2185B">{selected_year}</span> es de <span style="color:#C2185B">{calculos_df.loc[0, "Edad promedio"]:,.2f} años</span>. Se trata de un estadístico de tendencia central útil. No obstante, ante la existencia de datos aberrantes, se sugiere la mediana de la edad disponible en las última sección de este tablero, cuya cualidad es que es menos sensible a los datos extremos.', unsafe_allow_html=True)
             st.markdown(f'Si bien excedemos el objetivo de esta app, vale la pena señalar que la distribución por edad tiende a reducir su sesgo y comportarse como una distribución normal en periodos posteriores a 2030. Lo anterior es atribuible a factores tales como: <span style="color:#C2185B">(i) Reducción de las tasas de nacimiento; (ii) Incremento en la expectativa de vida; (iii) Reducción de las tasas de mortalidad; (iv) Factores sociales y económicos; (v) Impacto migratorio</span>.', unsafe_allow_html=True)
 
         
